@@ -1,0 +1,35 @@
+打开VMware，在顶部依次选择：编辑 > 虚拟网路编辑器，打开虚拟网路编辑器：
+ 
+首先，去掉VMnet0和VMnet1，只保留VMnet8。然后，去掉如下图中的“使用本地DHCP服务奖IP地址分配给虚拟机”：
+ 
+此外，这里的子网IP为：192.168.8.0，子网掩码为：255.255.255.0，因此，在Ubuntu中，设置IP地址的时候，可以设置为192.168.8.x，x可以为1~255。
+选择“NAT设置”，打开NAT设置面板：
+ 
+查看自己的网关地址，例如，此处的网关应该为：192.168.8.2。
+最后，在VMWare的虚拟机管理界面，选择Ubuntu的“编辑虚拟机设置”，打开Ubuntu这个虚拟的设置界面。
+选择网络适配器，然后确定网络连接选中的是“自定义”中的VMnet8(NAT模式)：
+ 
+完成以上步骤，VMWare的网络环境也就设置完成。
+
+打开Ubuntu的终端，输入：
+sudo gedit /etc/network/interfaces
+表示使用gedit编辑器打开interfaces文件。 在打开的文件中，若有内容，先全部删除。然后输入如下代码：
+auto lo
+iface lo inet loopback
+auto ens33
+iface ens33 inet static
+address 192.168.8.100
+netmask 255.255.255.0
+gateway 192.168.8.2
+如下图所示：
+ 
+然后，配置DNS服务器：
+sudo gedit /etc/resolv.conf
+在里面填入阿里的DNS：223.5.5.5
+nameserver 223.5.5.5
+保存
+关闭gedit（先保存，后关闭），然后，在命令行中输入：
+sudo /etc/init.d/networking restart
+重启网络即可。
+
+
